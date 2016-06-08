@@ -1,0 +1,2 @@
+include "core", "docs"
+rootProject.children.each { it.name = "scaffolding-${it.name}" }
