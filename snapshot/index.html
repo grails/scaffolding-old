@@ -528,8 +528,15 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_context">2.3. Context</a></li>
 </ul>
 </li>
-<li><a href="#_configuration">3. Configuration</a></li>
-<li><a href="#_extending">4. Extending</a></li>
+<li><a href="#_installation">3. Installation</a></li>
+<li><a href="#_usage">4. Usage</a></li>
+<li><a href="#_extending">5. Extending</a>
+<ul class="sectlevel2">
+<li><a href="#_which_properties_are_rendered">5.1. Which properties are rendered</a></li>
+<li><a href="#_how_the_different_contexts_are_rendered">5.2. How the different contexts are rendered</a></li>
+<li><a href="#_how_properties_are_rendered">5.3. How properties are rendered</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -537,7 +544,15 @@ table.CodeRay td.code>pre{padding:0}
 <div class="sect1">
 <h2 id="_introduction">1. Introduction</h2>
 <div class="sectionbody">
-
+<div class="paragraph">
+<p>The Grails scaffolding core module was created to render 3 separate views: list, show, and create/edit. By default the views are rendered in a similar way to the fields plugin. All of the applicable rules of the fields plugin also apply to this module.</p>
+</div>
+<div class="paragraph">
+<p>Scaffolding core is designed to render markup intended to be processed by a template engine. The classes provided by this library will always render markup based on the definition of a domain class, instead of an individual instance or instances of a domain class that contain real data.</p>
+</div>
+<div class="paragraph">
+<p>This user guide will cover how this library works along with how developers can extend it to completely customize the results.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -566,40 +581,235 @@ table.CodeRay td.code>pre{padding:0}
 <div class="sect3">
 <h4 id="_list_output_context">2.3.1. List Output Context</h4>
 <div class="paragraph">
-<p>Used to define how a list of domain class instances will be rendered. Examples are a table or a grid</p>
+<p>The markup surrounding the display of a list of domain classes. Examples are a table or a grid.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_output_context_domain">2.3.2. Output Context (Domain)</h4>
-
+<div class="paragraph">
+<p>The markup surrounding the display of a domain class. An example is a container or ordered list.</p>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_output_context_property">2.3.3. Output Context (Property)</h4>
-
+<div class="paragraph">
+<p>The markup surrounding the display of an individual domain class property. An example is a row in a grid or a list item.</p>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_input_context_domain">2.3.4. Input Context (Domain)</h4>
-
+<div class="paragraph">
+<p>The markup surrounding where a domain class will be created or modified. An example is a form.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_input_context_property">2.3.5. Input Context (Property)</h4>
+<div class="paragraph">
+<p>The markup surrounding the input of a domain class property. An example is a cell in a grid.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_embedded_output_context">2.3.6. Embedded Output Context</h4>
+<div class="paragraph">
+<p>The markup surrounding the input of the properties of an embedded domain class property. An example is a header.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_embedded_input_context">2.3.7. Embedded Input Context</h4>
+<div class="paragraph">
+<p>The markup surrounding the display of the properties of an embedded domain class property. An example is a fieldset.</p>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_configuration">3. Configuration</h2>
+<h2 id="_installation">3. Installation</h2>
 <div class="sectionbody">
-
+<div class="paragraph">
+<p>To start using this library, there are only a couple simple steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Import the library in your <code>build.gradle</code></p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> compile "org.grails:scaffolding-core:1.0.0-SNAPSHOT"</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Register the scaffolding core bean configuration <a href="api/org/grails/scaffolding/ScaffoldingBeanConfiguration.html">ScaffoldingBeanConfiguration</a></p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> scaffoldingBeanConfiguration(ScaffoldingBeanConfiguration)</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_extending">4. Extending</h2>
+<h2 id="_usage">4. Usage</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>To render markup, inject the <a href="api/org/grails/scaffolding/markup/DomainMarkupRenderer.html">DomainMarkupRenderer</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> DomainMarkupRenderer domainMarkupRenderer</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then execute one of the methods provided:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>renderOutput</code> (Show page)</p>
+</li>
+<li>
+<p><code>renderInput</code> (Edit/Create page)</p>
+</li>
+<li>
+<p><code>renderListOutput</code> (List page)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A string containing all of the markup will be returned.</p>
+</div>
+<div class="paragraph">
+<p>Each of the methods requires a <a href="http://gorm.grails.org/latest/api/org/grails/datastore/mapping/model/PersistentEntity.html">PersistentEntity</a> that represents the given domain class. To retrieve the <a href="http://gorm.grails.org/latest/api/org/grails/datastore/mapping/model/PersistentEntity.html">PersistentEntity</a>, inject the mapping context and pass in the fully qualified domain class name.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> MappingContext grailsDomainClassMappingContext
 
+ grailsDomainClassMappingContext.getPersistentEntity("test.foo.Bar")</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_extending">5. Extending</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>All aspects of the way markup is created can be changed.</p>
+</div>
+<div class="sect2">
+<h3 id="_which_properties_are_rendered">5.1. Which properties are rendered</h3>
+<div class="paragraph">
+<p>The <a href="api/org/grails/scaffolding/model/DomainModelService.html">DomainModelService</a> is responsible for returning which properties should be rendered for any given view. To override the default behavior, register a bean with the name "domainModelService" that implements the <a href="api/org/grails/scaffolding/model/DomainModelService.html">DomainModelService</a> interface. You can extend the default implementation <a href="api/org/grails/scaffolding/model/DomainModelServiceImpl.html">DomainModelServiceImpl</a> if you wish.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_how_the_different_contexts_are_rendered">5.2. How the different contexts are rendered</h3>
+<div class="paragraph">
+<p>The <a href="api/org/grails/scaffolding/markup/ContextMarkupRenderer.html">ContextMarkupRenderer</a> is responsible for rendering all of the contexts. To override the default behavior, register a bean with the name "contextMarkupRenderer" that implements the <a href="api/org/grails/scaffolding/markup/ContextMarkupRenderer.html">ContextMarkupRenderer</a> interface. You can extend the default implementation <a href="api/org/grails/scaffolding/markup/ContextMarkupRendererImpl.html">ContextMarkupRendererImpl</a> if you wish.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_how_properties_are_rendered">5.3. How properties are rendered</h3>
+<div class="paragraph">
+<p>The <a href="api/org/grails/scaffolding/markup/PropertyMarkupRenderer.html">PropertyMarkupRenderer</a> is responsible for rendering all of domain properties. To override the default behavior, register a bean with the name "propertyMarkupRenderer" that implements the <a href="api/org/grails/scaffolding/markup/PropertyMarkupRenderer.html">PropertyMarkupRenderer</a> interface. You can extend the default implementation <a href="api/org/grails/scaffolding/markup/PropertyMarkupRendererImpl.html">PropertyMarkupRendererImpl</a> if you wish.</p>
+</div>
+<div class="paragraph">
+<p>The default implementation simply defers to a domain output or input registry. The most convenient way to control how a specific type of property will be rendered is to register an input or ouput renderer to the registry.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All of the default renderers in the registry have a priority of &lt; 0, so registering a custom one with a priority of &gt; 0 will ensure it is used over the default
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_input_rendering">5.3.1. Input Rendering</h4>
+<div class="paragraph">
+<p>Input renders must implement the <a href="api/org/grails/scaffolding/registry/DomainInputRenderer.html">DomainInputRenderer</a> interface. Implementations must define 2 methods.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Boolean supports(DomainProperty domainProperty)</code>
+Return true if your renderer supports the given property. See the <a href="api/org/grails/scaffolding/model/property/DomainProperty.html">DomainProperty</a> and <a href="http://gorm.grails.org/latest/api/org/grails/datastore/mapping/model/PersistentProperty.html">PersistentProperty</a> interfaces to see what data is available on the domain property instance.</p>
+</li>
+<li>
+<p><code>Closure renderInput(Map defaultAttributes, DomainProperty property)</code>
+Return a closure to be passed to a <a href="http://docs.groovy-lang.org/latest/html/api/groovy/xml/MarkupBuilder.html">MarkupBuilder</a> that renders your property</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The default attributes passed to <code>renderInput</code> are created by the <a href="api/org/grails/scaffolding/markup/PropertyMarkupRenderer.html#getStandardAttributes(org.grails.scaffolding.model.property.DomainProperty)">PropertyMarkupRenderer#getStandardAttributes</a> method.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To register your renderer, inject the "domainInputRendererRegistry" bean and execute <code>registerDomainRenderer</code>, passing along your renderer and its priority.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> DomainInputRendererRegistry domainInputRendererRegistry
+
+ domainInputRendererRegistry.registerDomainRenderer(new MyCustomDomainInputRenderer(), 1)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_output_rendering">5.3.2. Output Rendering</h4>
+<div class="paragraph">
+<p>Output renders must implement the <a href="api/org/grails/scaffolding/registry/DomainOutputRenderer.html">DomainOutputRenderer</a> interface. Implementations must define 3 methods.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Boolean supports(DomainProperty domainProperty)</code>
+Return true if your renderer supports the given property. See the <a href="api/org/grails/scaffolding/model/property/DomainProperty.html">DomainProperty</a> and <a href="http://gorm.grails.org/latest/api/org/grails/datastore/mapping/model/PersistentProperty.html">PersistentProperty</a> interfaces to see what data is available on the domain property instance.</p>
+</li>
+<li>
+<p><code>Closure renderListOutput(DomainProperty property)</code>
+Return a closure to be passed to a <a href="http://docs.groovy-lang.org/latest/html/api/groovy/xml/MarkupBuilder.html">MarkupBuilder</a> that renders your property in the context of a list of domain class instances</p>
+</li>
+<li>
+<p><code>Closure renderOutput(DomainProperty property)</code>
+Return a closure to be passed to a <a href="http://docs.groovy-lang.org/latest/html/api/groovy/xml/MarkupBuilder.html">MarkupBuilder</a> that renders your property in the context of a single domain class instance</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To register your renderer, inject the "domainOutputRendererRegistry" bean and execute <code>registerDomainRenderer</code>, passing along your renderer and its priority.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"> DomainOutputRendererRegistry domainOutputRendererRegistry
+
+ domainOutputRendererRegistry.registerDomainRenderer(new MyCustomDomainOutputRenderer(), 1)</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-13 14:01:07 UTC
+Last updated 2016-06-13 16:47:03 UTC
 </div>
 </div>
 </body>
