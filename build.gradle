@@ -1,5 +1,5 @@
 ext {
-	grailsVersion = project.grailsVersion
+    grailsVersion = project.grailsVersion
     gradleWrapperVersion = project.gradleWrapperVersion
     userOrg = "grails"
 }
@@ -11,7 +11,7 @@ subprojects {
         userOrg = "grails"
     }
     group "org.grails"
-    version "1.0.2"
+    version "1.0.3.BUILD-SNAPSHOT"
     repositories {
         mavenLocal()
         mavenCentral()
