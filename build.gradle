@@ -7,6 +7,7 @@ ext {
 apply plugin:'idea'
 
 subprojects {
+
     ext {
         userOrg = "grails"
     }
@@ -18,8 +19,5 @@ subprojects {
         mavenCentral()
         maven { url "https://repo.grails.org/grails/core" }
     }
-
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
 
 }
